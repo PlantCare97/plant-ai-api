@@ -1,0 +1,7 @@
+
+Flask
+numpy
+Pillow
+tensorflow
+google-generativeai
+gunicorn
