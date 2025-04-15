@@ -14,7 +14,7 @@ app = Flask(__name__)
 # Download model from Google Drive if not already present
 model_path = "vgg16_model.h5"
 if not os.path.exists(model_path):
-    gdown.download("https://drive.google.com/uc?id=YOUR_FILE_ID", model_path, quiet=False)
+    gdown.download("https://drive.google.com/uc?id=1-AeiQr_5LfyCBvk8VqKaBW3-mtNlvZtK", model_path, quiet=False)
 
 # Load the model
 loaded_model_VGG16 = load_model(model_path)
