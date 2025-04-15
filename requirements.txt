@@ -5,3 +5,4 @@ Pillow
 tensorflow
 google-generativeai
 gunicorn
+gdown
