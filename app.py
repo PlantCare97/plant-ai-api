@@ -1,34 +1,29 @@
-
-import os
 from flask import Flask, request, jsonify
-import google.generativeai as genai
-from tensorflow.keras.preprocessing import image
-import numpy as np
 from PIL import Image
+import numpy as np
+import os
 from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
+import google.generativeai as genai
+import io
 
 app = Flask(__name__)
 
-# Load your trained model
-
-# Download model from Google Drive if not already present
 model_path = "vgg16_model.h5"
 if not os.path.exists(model_path):
+    import gdown
     gdown.download("https://drive.google.com/uc?id=1-AeiQr_5LfyCBvk8VqKaBW3-mtNlvZtK", model_path, quiet=False)
 
-# Load the model
 loaded_model_VGG16 = load_model(model_path)
 
-# Configure Gemini API
+# Gemini setup
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
-
-# Initialize the Gemini model
 model = genai.GenerativeModel('gemini-2.0-flash')
 
 class_names = ['Apple', 'Blueberry', 'Corn_(maize)', 'Grape']
 
-@app.route('/predict', methods=['POST'])
+@app.route('/api/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
@@ -37,10 +32,7 @@ def predict():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    img_path = os.path.join('/tmp', file.filename)
-    file.save(img_path)
-
-    img_pil = Image.open(img_path)
+    img_pil = Image.open(file.stream)
 
     try:
         response = model.generate_content([
@@ -50,7 +42,7 @@ def predict():
         is_plant = response.text.strip().lower() == 'yes'
 
         if is_plant:
-            img = image.load_img(img_path, target_size=(200, 200))
+            img = img_pil.resize((200, 200))
             img_array = image.img_to_array(img)
             img_array = np.expand_dims(img_array, axis=0)
             predictions = loaded_model_VGG16.predict(img_array)
@@ -59,12 +51,11 @@ def predict():
         else:
             predicted_class_name = "Unknown"
 
-        os.remove(img_path)
         return jsonify({'predicted_class': predicted_class_name}), 200
 
     except Exception as e:
-        os.remove(img_path)
         return jsonify({'error': f"An error occurred: {str(e)}"}), 500
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+# Vercel expects this handler
+def handler(environ, start_response):
+    return app(environ, start_response)
