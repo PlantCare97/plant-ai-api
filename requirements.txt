@@ -1,6 +1,5 @@
-Flask
-Pillow
-numpy
 tensorflow
+pillow
+numpy
 gdown
 google-generativeai
