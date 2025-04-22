@@ -1,8 +1,6 @@
-
 Flask
-numpy
 Pillow
+numpy
 tensorflow
-google-generativeai
-gunicorn
 gdown
+google-generativeai
