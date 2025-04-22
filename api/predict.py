@@ -16,6 +16,7 @@ model_path = "vgg16_model.keras"
 
 # Load the Keras model directly from the repo
 loaded_model = load_model(model_path)
+print("Model loaded successfully:", loaded_model.summary())
 
 # Class names
 class_names = ['Apple_Black-rot', 'Apple_healthy', 'Cherry_Powdery-mildew', 'Cherry_healthy',
